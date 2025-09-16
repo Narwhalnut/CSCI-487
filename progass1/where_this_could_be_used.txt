@@ -1,0 +1,7 @@
+This could be used for path finding in video game development!
+
+A* avoids expanding already expensive paths.
+
+Every 60 ticks (or whatever) have mobs search down many paths towards a goal, favoring lower cost paths (shorter straight-line distance on the tile grid). But, if needed, path-finding will expand to higher-cost options.
+
+You may need to enforce a depth cutoff. (Say a path takes more than 20 moves or has a cost of greater than 20 at any point, then give up on that path and do not traverse the dead tiles again.)
