@@ -2,24 +2,57 @@ import copy
 
 class BoardState:
     # Represents an individual node in the search tree.
-    # Branch into each possible new state
-    # Print the board state
+    # Can branch into each possible new state.
+    # Print the board state.
 
-    def __init__(self, tile_values, preceeding_cost):
+    def __init__(self, tile_values, preceeding_real_cost):
         # Constructor. Pass in the values of each tile and current cost.
         self.array = tile_values
-        self.preceeding_cost = preceeding_cost
-        self.total_cost = preceeding_cost
+        self.preceeding_real_cost = preceeding_real_cost
+        self.estimated_total_cost = -1
+        
+        self.children = []
         # Check if we are solved.
         self.solved = False
         
-    def isSolved():
+    def IsSolved(self):
         # Getter
         return self.solved
         
+    def GetChildren(self):
+        # Returns all children. Expands if not expanded already.
+        if not self.children:
+            self.children = self.Expand()
+        return self.children
+    
+    def IsLeaf(self):
+        # Checks if this node has been expanded yet.
+        if not self.children:
+            return True
+        return False
+        
+    def GetLowestCostPath(self,preceeding_path):
+        # Returns the lowest cost path to a leaf in the current tree (recursive).
+        path = copy.deepcopy(preceeding_path)
+        path.append(self)
+        cheapest_path = None
+        
+        if self.IsLeaf():
+            # If there are no children, this is the end of this path.
+            cheapest_path = path
+        else:
+            # Check all children to find the cheapest (estimated) value.
+            for c in self.children:
+                current_node = c.GetLowestCostPath(path)
+                if (cheapest_path == None or current_node[-1].estimated_total_cost < cheapest_path[-1].estimated_total_cost):
+                    cheapest_path = current_node
+                    current_cost = cheapest_path[-1].estimated_total_cost
+        return cheapest_path
+                
+    
     def EstimateTotalCost(self):
         # Estimate the total cost of this state based on the preceeding cost.
-        cost = self.preceeding_cost
+        cost = self.preceeding_real_cost
         i = 0
         for tile_value in self.array:
             i = i + 1
@@ -30,12 +63,12 @@ class BoardState:
             elif i != tile_value:
                 cost = cost + 1
         # Update "solved"
-        self.solved = (cost == self.preceeding_cost)
+        self.solved = (cost == self.preceeding_real_cost)
         # Update cost
-        self.total_cost = cost
+        self.estimated_total_cost = cost
     
     def Expand(self):
-        # Returns up to 4 board states of all possible moves.
+        # Calculates 4 possible moves and returns them.
         
         # Start by finding the empty slot.
         empty_slot_coords = [0,0]
@@ -53,24 +86,27 @@ class BoardState:
         # For each possible adjacent swap for the empty index, create a branch.
         # North Swap Branch
         if empty_slot_coords[1] > 0:
-            b = BoardState(copy.deepcopy(self.array), self.total_cost+1)
+            b = BoardState(copy.deepcopy(self.array), self.preceeding_real_cost+1)
             b.Swap(empty_slot_index,empty_slot_index-3)
             branches.append(b)
         # East Swap Branch
         if empty_slot_coords[0] < 2:
-            b = BoardState(copy.deepcopy(self.array), self.total_cost+1)
+            b = BoardState(copy.deepcopy(self.array), self.preceeding_real_cost+1)
             b.Swap(empty_slot_index,empty_slot_index+1)
             branches.append(b)
         # South Swap Brach
         if empty_slot_coords[1] < 2:
-            b = BoardState(copy.deepcopy(self.array), self.total_cost+1)
+            b = BoardState(copy.deepcopy(self.array), self.preceeding_real_cost+1)
             b.Swap(empty_slot_index,empty_slot_index+3)
             branches.append(b)
         # West Swap Branch
         if empty_slot_coords[0] > 0:
-            b = BoardState(copy.deepcopy(self.array), self.total_cost+1)
+            b = BoardState(copy.deepcopy(self.array), self.preceeding_real_cost+1)
             b.Swap(empty_slot_index,empty_slot_index-1)
             branches.append(b)
+        # Evaluate each branch when created
+        for b in branches:
+            b.EstimateTotalCost()
         # Return all newly created branches.
         return branches
     
@@ -84,7 +120,6 @@ class BoardState:
     
     def Print(self):
         # Print the board state in an easily human readable way
-        print("STATE:", end="\n")
         i = 0
         for tile_value in self.array:
             ending = " "
@@ -97,4 +132,4 @@ class BoardState:
                 value = str(tile_value)
             print(value, end=ending)
             i = (i + 1) % 3
-        print("    cost..." + str(self.total_cost))
+        print("    estimated total cost..." + str(self.estimated_total_cost))
