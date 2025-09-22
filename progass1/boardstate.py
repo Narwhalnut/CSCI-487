@@ -11,15 +11,35 @@ class BoardState:
         self.preceeding_real_cost = preceeding_real_cost
         self.estimated_total_cost = -1
         
+        self.cheapest_possible_child = None
+        
         self.children = []
         # Check if we are solved.
         self.solved = False
+    
+    def GetCheapestPossibleChild(self):
+        # Get the cheapest child in this tree
         
+        # If we have no children, use ourself
+        if self.IsLeaf():
+            return self
+        # If the last found value is still valid, use it.
+        if self.cheapest_possible_child != None and self.cheapest_possible_child.IsLeaf():
+            return self.cheapest_possible_child
+        
+        # Search each child for the cheapest
+        self.cheapest_possible_child = None
+        for c in self.children:
+            current_node = c.GetCheapestPossibleChild()
+            if (self.cheapest_possible_child == None or current_node.estimated_total_cost < self.cheapest_possible_child.estimated_total_cost):
+                self.cheapest_possible_child = current_node
+        return self.cheapest_possible_child
+    
     def IsSolved(self):
         # Getter
         return self.solved
         
-    def GetChildren(self):
+    def GetChildren(self, closed_list):
         # Returns all children. Expands if not expanded already.
         if not self.children:
             self.children = self.Expand()
@@ -30,42 +50,23 @@ class BoardState:
         if not self.children:
             return True
         return False
-        
-    def GetLowestCostPath(self,preceeding_path):
-        # Returns the lowest cost path to a leaf in the current tree (recursive).
-        path = copy.deepcopy(preceeding_path)
-        path.append(self)
-        cheapest_path = None
-        
-        if self.IsLeaf():
-            # If there are no children, this is the end of this path.
-            cheapest_path = path
-        else:
-            # Check all children to find the cheapest (estimated) value.
-            for c in self.children:
-                current_node = c.GetLowestCostPath(path)
-                if (cheapest_path == None or current_node[-1].estimated_total_cost < cheapest_path[-1].estimated_total_cost):
-                    cheapest_path = current_node
-                    current_cost = cheapest_path[-1].estimated_total_cost
-        return cheapest_path
-                
     
     def EstimateTotalCost(self):
         # Estimate the total cost of this state based on the preceeding cost.
-        cost = self.preceeding_real_cost
+        cost = 0
         i = 0
         for tile_value in self.array:
             i = i + 1
-            # If this tile is displaced, that is an additional cost.
+            # If this tile is misplaced, that is an additional cost.
             if i == 9:
                 # Don't care. This spot is supposed to be empty.
                 pass
             elif i != tile_value:
                 cost = cost + 1
         # Update "solved"
-        self.solved = (cost == self.preceeding_real_cost)
+        self.solved = (cost == 0)
         # Update cost
-        self.estimated_total_cost = cost
+        self.estimated_total_cost = cost + self.preceeding_real_cost
     
     def Expand(self):
         # Calculates 4 possible moves and returns them.
