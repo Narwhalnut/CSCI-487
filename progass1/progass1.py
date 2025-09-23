@@ -5,7 +5,33 @@ import copy
 EXPANSION_LIMIT = 100000
 random.seed("smeal")
 
+def main():
+    # Initialize 3 Random States
+    initial_array = [1,2,3,4,5,6,7,8,0]
+    initial_states = []
+    print("#### INITIAL BOARDS ####")
+    for i in range(3):
+        random.shuffle(initial_array)
+        initial = BoardState(copy.deepcopy(initial_array))
+        initial.EstimateTotalCost()
+        initial_states.append(initial)
+        initial.Print()
+        print("------")
+    # Searches each state using each method
+    print("For each board, two search methods will be executed:")
+    print("Breadth-First Search and A* Search.")
+    for initial in initial_states:
+        print("#### BREADTH-FIRST SEARCH BEGIN ####")
+        initial.Print()
+        input("PRESS ENTER")
+        solution_path = BreadthFirst(initial);
+        print("#### A* SEARCH BEGIN ####")
+        initial.Print()
+        input("PRESS ENTER")
+        solution_path = AStar(initial);
+
 def AStar(root):
+    # Implements the A* search from a given root
     # Start at the root
     step = 0
     closed_list = []
@@ -25,7 +51,7 @@ def AStar(root):
         step = step + 1
         cost = sentry.estimated_total_cost
         children = sentry.GetChildren()
-        # Check for a solution
+        # Check for a solution in the children
         solution = None
         for c in children:
             if c.IsSolved():
@@ -42,7 +68,7 @@ def AStar(root):
         else:
             # Always solvable in 31 possible moves. If above 31, give up.
             if step >= EXPANSION_LIMIT:
-                print("#### A* SEARCH FAILED ####")
+                print("#### SEARCH FAILED ####")
                 print("A path could not be found in the expansion limit (" + str(EXPANSION_LIMIT) + ").")
                 print("It is unlikely that this configuration is solvable.")
                 keep_going = False
@@ -52,6 +78,7 @@ def AStar(root):
                     print("Searching... " + str(step) + " expansions.")
 
 def BreadthFirst(root):
+    # Implements the breadth first search from a given root
     # Start at the root
     step = 0
     depth = 0
@@ -69,6 +96,7 @@ def BreadthFirst(root):
                 children = sentry.GetChildren()
                 closed_list.append(sentry.array)
                 step = step + 1
+                # Check for a solution in the children
                 for c in children:
                     if c.IsSolved():
                         solution = c
@@ -76,7 +104,7 @@ def BreadthFirst(root):
         depth = depth + 1
         # If a solution was found, append it to the path and return.
         if solution != None:
-            print("#### BREADTH FIRST SEARCH SUCCESS ####")
+            print("#### BREADTH-FIRST SEARCH SUCCESS ####")
             path = solution.GetPath()
             for p in path:
                 p.Print()
@@ -87,7 +115,7 @@ def BreadthFirst(root):
         else:
             # Always solvable in 31 possible moves. If above 31, give up.
             if step >= EXPANSION_LIMIT:
-                print("#### BREADTH FIRST SEARCH FAILED ####")
+                print("#### SEARCH FAILED ####")
                 print("A path could not be found in the expansion limit (" + str(EXPANSION_LIMIT) + ").")
                 print("It is unlikely that this configuration is solvable.")
                 keep_going = False
@@ -95,25 +123,6 @@ def BreadthFirst(root):
                 # Occassional User Feedback
                 if depth > 10:
                     print("Searching... " + str(step) + " expansions.")
-    
-            
 
-# Initialize 3 States and try all searches
-initial_array = [1,2,3,4,5,6,7,8,0]
-initial_states = []
-for i in range(3):
-    random.shuffle(initial_array)
-    initial = BoardState(copy.deepcopy(initial_array))
-    # initial = BoardState([5,1,3,0,2,6,4,7,8]) # Displays a perfect, followable test case
-    # initial = BoardState([4,1,3,7,2,5,8,0,6]) # Displays a perfect, followable test case
-    initial_states.append(initial)
-
-for initial in initial_states:
-    initial.EstimateTotalCost()
-    print("\n######## INITIAL BOARD ########")
-    initial.Print()
-    # solution_path = BreadthFirst(initial);
-    solution_path = AStar(initial);
-    if False:
-        for b in solution_path:
-            b.Print()
+if __name__ == "__main__":
+    main()

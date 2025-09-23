@@ -20,7 +20,6 @@ class BoardState:
         self.cheapest_possible_child = None
         
         self.children = []
-        # Check if we are solved.
         self.solved = False
     
     def GetAllLeavesAtDepth(self, depth):
@@ -52,7 +51,7 @@ class BoardState:
         if self.cheapest_possible_child != None and self.cheapest_possible_child.IsLeaf() and self.cheapest_possible_child.is_closed == False:
             return self.cheapest_possible_child
         
-        # Search each child for the cheapest
+        # Otherwise, search each child for the cheapest
         self.cheapest_possible_child = None
         for c in self.children:
             current_node = c.GetCheapestPossibleChild()
@@ -77,6 +76,7 @@ class BoardState:
         return False
     
     def EstimateTotalCost(self):
+        # This node is closed. Do not select it
         if self.is_closed:
             self.estimated_total_cost = HIGH
             return
