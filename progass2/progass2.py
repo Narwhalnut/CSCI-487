@@ -2,27 +2,31 @@ import random
 
 # Date edited in simulation.
 # General
-REWARD_PROBABILITIES = [0.1, 0.5, 0.8, 0.95];
-CORRECT = 3;
-STEP_SIZES = [0.1,0.05,0.02,0.01];
+REWARD_PROBABILITIES = [0.19,0.2,0.21,0.59,0.6,0.61,0.72,0.41,0.39,0.4];
+CORRECT = 6;
+STEP_SIZES = [0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5];
+RESULT = 0;
+ITERATIONS = 1;
 # For PLA
-action_count = [0,0,0,0];
-estimated_reward_probabilities = [0, 0, 0, 0];
+action_count = [0,0,0,0,0,0,0,0,0,0];
+estimated_reward_probabilities = [0,0,0,0,0,0,0,0,0,0];
 
-# Simulates machine learning for the given parameters.
+# Simulates machine learning for the given parameters. Returns a tuple [result, iterations].
 def simulate_reinforcement_learning(is_pla, step_size):
     # clear data.
+    iterations = 0;
     best_action = -1;
     keep_going = True;
     if is_pla:
-        action_count = [0,0,0,0];
-        estimated_reward_probabilities = [0, 0, 0, 0];
+        action_count = [0,0,0,0,0,0,0,0,0,0];
+        estimated_reward_probabilities = [0,0,0,0,0,0,0,0,0,0];
 
     # 1. The action probabilities are initialized to 1/n.
-    action_probabilities = [0.25,0.25,0.25,0.25];
+    action_probabilities = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1];
 
     while (keep_going):
         # Keep going until action proabilities converge.
+        iterations = iterations + 1;
 
         # 2. The agent randomly chooses an action by sampling the action rates.
         random_float = random.random();
@@ -79,28 +83,43 @@ def simulate_reinforcement_learning(is_pla, step_size):
                 keep_going = False;
                 break;
     # Return the decision
-    return best_action;
+    return (best_action, iterations);
 
-# Runs 100 instances of the simulation and returns accuracy percentage.
+# Runs 100 simulations. Returns a tuple [accuracy, iterations].
 def trial(is_pla, step_size):
     accurate_trials = 0;
+    iteration_total = 0;
     for trials in range(100):
-        best_action = simulate_reinforcement_learning(is_pla, step_size);
-        if best_action == CORRECT:
+        results = simulate_reinforcement_learning(is_pla, step_size);
+        # Add to the accuracy count if the conclusion was correct.
+        if results[RESULT] == CORRECT:
             accurate_trials += 1;
-    return (accurate_trials / 100);
+        # Track the number of iterations required.
+        iteration_total += results[ITERATIONS];
+    return (accurate_trials / 100, iteration_total / 100);
 
+# Trials L-RI and PLA for various different step sizes.
 def main():
+    # Randomize the environment.
+    random.seed()
+
     is_pla = False;
     step_size = STEP_SIZES[0];
     
-    # Trial each step size and obtain accuracy.
-    for i in range(len(STEP_SIZES)):
-        step_size = STEP_SIZES[i];
-        print("step size: " + str(step_size));
-        accuracy = trial(False, step_size);
-        print("  accuracy: " + str(accuracy));
+    # Trial both PLA and L-RI.
+    for i in range(2):
+        if i == 0:
+            print("L-RI");
+            is_pla = False;
+        else:
+            print("PLA");
+            is_pla = True;
+        # Trial each step size and obtain accuracy.
+        for j in range(len(STEP_SIZES)):
+            step_size = STEP_SIZES[j];
+            results = trial(is_pla, step_size);
+            print("  [" + str(step_size) + "] accuracy: " + str(results[RESULT]) + " iterations: " + str(results[ITERATIONS]));
 
+# Execute main.
 if __name__ == "__main__":
     main();
-
