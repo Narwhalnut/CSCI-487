@@ -1,4 +1,5 @@
-import random
+import random # Used for random float generation.
+import matplotlib.pyplot as plt # Used only for generating the plots seen in the paper.
 
 # Date edited in simulation.
 # General
@@ -106,19 +107,52 @@ def main():
     is_pla = False;
     step_size = STEP_SIZES[0];
     
-    # Trial both PLA and L-RI.
-    for i in range(2):
-        if i == 0:
-            print("L-RI");
-            is_pla = False;
-        else:
-            print("PLA");
-            is_pla = True;
-        # Trial each step size and obtain accuracy.
-        for j in range(len(STEP_SIZES)):
-            step_size = STEP_SIZES[j];
-            results = trial(is_pla, step_size);
-            print("  [" + str(step_size) + "] accuracy: " + str(results[RESULT]) + " iterations: " + str(results[ITERATIONS]));
+    # L-RI
+    print("L-RI");
+    iterations_lri = [];
+    accuracy_lri = [];
+    # Trial each step size.
+    for j in range(len(STEP_SIZES)):
+        step_size = STEP_SIZES[j];
+        results = trial(is_pla, step_size);
+        print("  [" + str(step_size) + "] accuracy: " + str(results[RESULT]) + " iterations: " + str(results[ITERATIONS]));
+        # Track points for the plots later.
+        iterations_lri.append(results[ITERATIONS]);
+        accuracy_lri.append(results[RESULT]);
+    
+    # PLA
+    print("PLA");
+    is_pla = True;
+    iterations_pla = [];
+    accuracy_pla = [];
+    # Trial each step size.
+    for j in range(len(STEP_SIZES)):
+        step_size = STEP_SIZES[j];
+        results= trial(is_pla, step_size);
+        print("  [" + str(step_size) + "] accuracy: " + str(results[RESULT]) + " iterations: " + str(results[ITERATIONS]));
+        # Track points for the plots later.
+        iterations_pla.append(results[ITERATIONS]);
+        accuracy_pla.append(results[RESULT]);
+        
+    # Make Plots
+    # Accuracy
+    plt.plot(STEP_SIZES, accuracy_lri, label = "L-RI");
+    plt.plot(STEP_SIZES, accuracy_pla, label = "PLA");
+    plt.legend();
+    plt.title("Accuracy");
+    plt.xlabel("Step Size");
+    plt.ylabel("Accuracy");
+    plt.show();
+    plt.clf();
+    # Speed
+    plt.plot(STEP_SIZES, iterations_lri, label = "L-RI");
+    plt.plot(STEP_SIZES, iterations_pla, label = "PLA");
+    plt.legend();
+    plt.title("Iteration Count");
+    plt.xlabel("Step Size");
+    plt.ylabel("Speed");
+    plt.show();
+        
 
 # Execute main.
 if __name__ == "__main__":
