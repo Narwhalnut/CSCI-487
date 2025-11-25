@@ -139,7 +139,7 @@ def main():
     plt.plot(STEP_SIZES, accuracy_lri, label = "L-RI");
     plt.plot(STEP_SIZES, accuracy_pla, label = "PLA");
     plt.legend();
-    plt.title("Accuracy");
+    plt.title("Accuracy Comparison L-RI vs. PLA");
     plt.xlabel("Step Size");
     plt.ylabel("Accuracy");
     plt.show();
@@ -148,9 +148,9 @@ def main():
     plt.plot(STEP_SIZES, iterations_lri, label = "L-RI");
     plt.plot(STEP_SIZES, iterations_pla, label = "PLA");
     plt.legend();
-    plt.title("Iteration Count");
+    plt.title("Iterations Comparison L-RI vs. PLA");
     plt.xlabel("Step Size");
-    plt.ylabel("Speed");
+    plt.ylabel("Iterations");
     plt.show();
         
 
