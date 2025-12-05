@@ -1,0 +1,31 @@
+* {
+	font-family: sans-serif;
+}
+
+.site_frame {
+	margin: 0 auto;
+	width: 50%;
+	max-width: 640px;
+}
+
+.app_frame {
+	position: relative;
+	width: 100%;
+	height: auto;
+}
+
+#floor_plan {
+	width: 100%;
+	position: relative;
+	z-index: -1;
+}
+
+.point {
+	height: auto;
+	left: 100%;
+	top: 50%;
+	position: absolute;
+	transform: translate(-100%, -50%);
+	width: 4%;
+	z-index: 0;
+}
