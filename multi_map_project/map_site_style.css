@@ -14,6 +14,7 @@ button {
 
 .app_frame {
 	/* A single window within the app */
+	margin: 0 auto;
 	position: relative;
 	width: 100%;
 	height: auto;
@@ -24,18 +25,27 @@ button {
 	/* Position (changed programmatically) */
 	position: absolute;
 	transform: translate(-100%, -50%);
-	/* Size */
-	width: 5%;
-	height: auto;
 	/* Sorting */
 	z-index: 0;
 }
 
+.room_point {
+	/* Size */
+	width: 4%;
+	height: auto;
+}
+
+.door_point {
+	/* Size */
+	width: 15%;
+	height: auto;
+}
+
 #panorama {
 	/* Where the 360 degree room photo is displayed */
+	margin: 0 auto;
 	width: 100%;
 	height: auto;
-	z-index: -1;
 }
 
 #floor_plan {
@@ -44,4 +54,9 @@ button {
 	height: auto;
 	position: relative;
 	z-index: -1;
+}
+
+#floor_plan_frame {
+	width: 75%;
+	max-width: 480px;
 }
